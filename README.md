@@ -323,12 +323,14 @@ No ASP.NET Core, para usar antes de qualquer requisição com `[Criptografado]`,
 
 1. Alterar o código. A lógica comum aos dois mundos fica em `Comum/` e `Configuracao/`; os middlewares do ASP.NET Core em `Middleware/` e `Extensions/`; os módulos do .NET Framework em `AspNet/`; o atributo `[Criptografado]` em `Atributos/` e os filtros de criptografia em `CriptografiaDados/` (`AspNetCore/` para o Core, `WebApi/` para o Web API 2).
 2. Incrementar `<Version>` no `.csproj` (correção → 1.4.1; recurso novo compatível → 1.5.0; mudança incompatível → 2.0.0) e atualizar `<PackageReleaseNotes>`.
-3. Gerar o pacote (precisa do SDK .NET 10; compila todas as versões de uma vez):
+3. Subir no `master` e criar a tag da versão. O GitHub Actions (`.github/workflows/build.yml`) compila, gera o pacote com a versão da tag e publica no nuget.org:
+   ```bash
+   git tag v1.5.0
+   git push origin v1.5.0
+   ```
+   A publicação usa o secret `NUGET_API_KEY` do repositório (*Settings → Secrets and variables → Actions*), com uma API key criada no nuget.org.
+   Para gerar o pacote localmente (precisa do SDK .NET 10; compila todas as versões de uma vez):
    ```bash
    dotnet pack ProtecaoSeguranca/ProtecaoSeguranca.csproj -c Release -o nupkgs
    ```
-4. Publicar no repositório *hosted* do Nexus (URL e API key com a STI):
-   ```bash
-   dotnet nuget push nupkgs/ProtecaoSeguranca.<versão>.nupkg -s <URL do nuget-hosted> -k <API key>
-   ```
-5. Atualizar a `Version` do `PackageReference` (ou o pacote pelo NuGet do Visual Studio) nos projetos que devem receber a mudança.
+4. Atualizar a `Version` do `PackageReference` (ou o pacote pelo NuGet do Visual Studio) nos projetos que devem receber a mudança.

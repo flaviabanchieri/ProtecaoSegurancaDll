@@ -1,0 +1,56 @@
+name: Build e publicação no NuGet
+
+# Push/PR no master: compila e gera o pacote (fica como artefato da execução).
+# Tag v* (ex.: v1.2.0): compila, gera o pacote com a versão da tag e publica no nuget.org.
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # Windows por ter o .NET Framework (net452) igual ao ambiente de desenvolvimento
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Definir versão
+        id: versao
+        shell: bash
+        run: |
+          # Na tag, a versão do pacote vem do nome dela (v1.2.0 → 1.2.0); fora dela, vale a <Version> do .csproj
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "args=-p:Version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restaurar
+        run: dotnet restore ProtecaoSeguranca.sln
+
+      - name: Compilar
+        run: dotnet build ProtecaoSeguranca.sln -c Release --no-restore ${{ steps.versao.outputs.args }}
+
+      - name: Gerar pacote
+        run: dotnet pack ProtecaoSeguranca/ProtecaoSeguranca.csproj -c Release --no-build -o nupkgs ${{ steps.versao.outputs.args }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pacote-nuget
+          path: nupkgs/*.nupkg
+
+      - name: Publicar no nuget.org
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "nupkgs/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
