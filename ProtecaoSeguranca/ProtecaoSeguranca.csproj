@@ -14,7 +14,7 @@
     <RootNamespace>ProtecaoSeguranca</RootNamespace>
     <PackageId>ProtecaoSeguranca</PackageId>
     <Version>1.1.0</Version>
-    <Authors>STI/CSIC</Authors>
+    <Authors>Flavia Banchieri Roca</Authors>
     <Description>DLL de cibersegurança para APIs ASP.NET Core (2.2 a 10) e ASP.NET (.NET Framework 4.5.2+): proteção contra SQL Injection, ocultação de erros 5xx, rate limit por IP, headers de segurança, validação de upload de arquivos e criptografia de propriedades marcadas com [Criptografado].</Description>
     <PackageReleaseNotes>1.1.0 - Validação de upload de arquivos (opcional): lista branca e lista negra de extensões, tamanho, quantidade, assinatura do formato e código de servidor embutido; configurável na seção Seguranca:UploadArquivos, com regras por path e modo SomenteLog. 1.0.0 - Atributo [Criptografado] nas propriedades dos DTOs: criptografa na saída e descriptografa na entrada em qualquer endpoint (ASP.NET Core via UsePortalSeguranca; Web API 2 via config.UsarCriptografia()); classe Criptografia para uso direto. 1.3.0 - Modo SomenteLog (monitorar sem bloquear) no SQL Injection e no rate limit; o padrão continua Bloquear. 1.2.0 - Suporte a ASP.NET Core 3.1, 5, 6, 7, 8, 9 e 10 e a ASP.NET (.NET Framework 4.5.2+) via IHttpModule. 1.1.0 - Headers de segurança (CSP, HSTS, X-Frame-Options...) e remoção de headers que revelam o servidor. 1.0.0 - Versão inicial: SQL Injection, ocultar erros 5xx e rate limit.</PackageReleaseNotes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
