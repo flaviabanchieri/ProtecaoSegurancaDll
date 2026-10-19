@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--
+      net452        → ASP.NET (.NET Framework 4.5.2 a 4.8.1): MVC, Web API, Web Forms, ASMX (IHttpModule)
+      netcoreapp2.2 → ASP.NET Core 2.2
+      netcoreapp3.1 → ASP.NET Core 3.1 e 5
+      net6.0        → ASP.NET Core 6 a 9
+      net10.0       → ASP.NET Core 10 em diante
+    -->
+    <TargetFrameworks>net452;netcoreapp2.2;netcoreapp3.1;net6.0;net10.0</TargetFrameworks>
+    <!-- 2.2, 3.1 e 6 estão fora de suporte, mas ainda há APIs nessas versões -->
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <RootNamespace>ProtecaoSeguranca</RootNamespace>
+    <PackageId>ProtecaoSeguranca</PackageId>
+    <Version>1.1.0</Version>
+    <Authors>STI/CSIC</Authors>
+    <Description>DLL de cibersegurança para APIs ASP.NET Core (2.2 a 10) e ASP.NET (.NET Framework 4.5.2+): proteção contra SQL Injection, ocultação de erros 5xx, rate limit por IP, headers de segurança, validação de upload de arquivos e criptografia de propriedades marcadas com [Criptografado].</Description>
+    <PackageReleaseNotes>1.1.0 - Validação de upload de arquivos (opcional): lista branca e lista negra de extensões, tamanho, quantidade, assinatura do formato e código de servidor embutido; configurável na seção Seguranca:UploadArquivos, com regras por path e modo SomenteLog. 1.0.0 - Atributo [Criptografado] nas propriedades dos DTOs: criptografa na saída e descriptografa na entrada em qualquer endpoint (ASP.NET Core via UsePortalSeguranca; Web API 2 via config.UsarCriptografia()); classe Criptografia para uso direto. 1.3.0 - Modo SomenteLog (monitorar sem bloquear) no SQL Injection e no rate limit; o padrão continua Bloquear. 1.2.0 - Suporte a ASP.NET Core 3.1, 5, 6, 7, 8, 9 e 10 e a ASP.NET (.NET Framework 4.5.2+) via IHttpModule. 1.1.0 - Headers de segurança (CSP, HSTS, X-Frame-Options...) e remoção de headers que revelam o servidor. 1.0.0 - Versão inicial: SQL Injection, ocultar erros 5xx e rate limit.</PackageReleaseNotes>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon></PackageIcon>
+  </PropertyGroup>
+
+  <!-- ASP.NET (.NET Framework): módulos da pasta AspNet e filtro do Web API 2 -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+    <Compile Remove="Middleware/**;Extensions/**;CriptografiaDados/AspNetCore/**" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <!-- Menor versão em uso nos projetos (traz também o Newtonsoft.Json) -->
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
+  </ItemGroup>
+
+  <!-- ASP.NET Core: middlewares e filtro MVC -->
+  <ItemGroup Condition="'$(TargetFramework)' != 'net452'">
+    <Compile Remove="AspNet/**;CriptografiaDados/WebApi/**" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net452' And '$(TargetFramework)' != 'netcoreapp2.2'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- A partir do 3.0 o Newtonsoft.Json não vem mais junto com o ASP.NET Core -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Icon\icone_seguranca.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="Icon\icone_seguranca.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
